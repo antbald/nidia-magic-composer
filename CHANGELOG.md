@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rollback capability
 - Version tracking and history
 
+## [0.1.1] - 2024-10-30
+
+### Fixed
+- Added base translation bundle so Home Assistant lists the integration.
+- Normalised repository links and version numbers across manifest, docs, and frontend.
+
 ## [0.1.0] - 2024-10-29
 
 ### Added
@@ -36,5 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder views for wizard steps
 - HACS integration support
 
-[Unreleased]: https://github.com/antoniobaldassarre/nidia-magic-composer/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/antoniobaldassarre/nidia-magic-composer/releases/tag/v0.1.0
+[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.1
+[0.1.0]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.0

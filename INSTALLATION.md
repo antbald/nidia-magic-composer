@@ -15,7 +15,7 @@
 3. Click the three dots (⋮) in the top right
 4. Select **Custom repositories**
 5. Add the repository:
-   - **Repository**: `https://github.com/antoniobaldassarre/nidia-magic-composer`
+   - **Repository**: `https://github.com/antbald/nidia-magic-composer`
    - **Category**: `Integration`
 6. Click **Add**
 
@@ -51,14 +51,14 @@ Download the latest release from GitHub:
 
 ```bash
 cd /config
-wget https://github.com/antoniobaldassarre/nidia-magic-composer/releases/latest/download/nidia_magic_composer.zip
+wget https://github.com/antbald/nidia-magic-composer/releases/latest/download/nidia_magic_composer.zip
 ```
 
 Or clone the repository:
 
 ```bash
 cd /config/custom_components
-git clone https://github.com/antoniobaldassarre/nidia-magic-composer.git
+git clone https://github.com/antbald/nidia-magic-composer.git
 cd nidia-magic-composer
 ```
 

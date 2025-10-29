@@ -194,32 +194,32 @@ cp -r custom_components/nidia_magic_composer \
 # Initialize git (if not already)
 git init
 git add .
-git commit -m "Initial integration skeleton v0.1.0"
+git commit -m "Initial integration skeleton v0.1.1"
 
 # Add remote and push
-git remote add origin https://github.com/antoniobaldassarre/nidia-magic-composer.git
+git remote add origin https://github.com/antbald/nidia-magic-composer.git
 git branch -M main
 git push -u origin main
 
 # Create release tag
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
 
 Then create a GitHub Release:
 1. Go to repository → Releases → New Release
-2. Tag: `v0.1.0`
-3. Title: `v0.1.0 - Initial Skeleton`
+2. Tag: `v0.1.1`
+3. Title: `v0.1.1 - Initial Skeleton`
 4. Description: Copy from CHANGELOG.md
 5. Publish
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/antoniobaldassarre/nidia-magic-composer/issues)
+- **Issues**: [GitHub Issues](https://github.com/antbald/nidia-magic-composer/issues)
 - **Development**: See [DEVELOPMENT.md](DEVELOPMENT.md)
 
 ---
 
 **Status**: ✅ Phase 1 Complete - Ready for Development
-**Version**: 0.1.0
+**Version**: 0.1.1
 **Last Updated**: 2024-10-29

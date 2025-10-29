@@ -50,7 +50,7 @@ nidia-magic-composer/
 ### Clone Repository
 
 ```bash
-git clone https://github.com/antoniobaldassarre/nidia-magic-composer.git
+git clone https://github.com/antbald/nidia-magic-composer.git
 cd nidia-magic-composer
 ```
 

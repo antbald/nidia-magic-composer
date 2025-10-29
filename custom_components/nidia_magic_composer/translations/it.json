@@ -1,0 +1,34 @@
+{
+  "title": "Nidia Magic Composer",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configura Nidia Magic Composer",
+        "description": "Imposta la procedura guidata Magic Composer per automatizzare la configurazione di Home Assistant.",
+        "data": {
+          "profile_name": "Nome profilo",
+          "enable_advanced": "Abilita funzioni avanzate"
+        }
+      }
+    },
+    "error": {
+      "already_configured": "Questa integrazione è già configurata.",
+      "unknown": "Si è verificato un errore imprevisto."
+    },
+    "abort": {
+      "already_configured": "Nidia Magic Composer è già configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni di Nidia Magic Composer",
+        "description": "Aggiorna i valori predefiniti per la procedura guidata Magic Composer.",
+        "data": {
+          "profile_name": "Nome profilo",
+          "enable_advanced": "Abilita funzioni avanzate"
+        }
+      }
+    }
+  }
+}

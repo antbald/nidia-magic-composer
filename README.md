@@ -1,8 +1,8 @@
 # Nidia Magic Composer
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/antoniobaldassarre/nidia-magic-composer.svg)](https://github.com/antoniobaldassarre/nidia-magic-composer/releases)
-[![License](https://img.shields.io/github/license/antoniobaldassarre/nidia-magic-composer.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/release/antbald/nidia-magic-composer.svg)](https://github.com/antbald/nidia-magic-composer/releases)
+[![License](https://img.shields.io/github/license/antbald/nidia-magic-composer.svg)](LICENSE)
 
 Automated Home Assistant setup wizard for the Nidia ecosystem. Simplifies initial deployment through a guided UI that creates areas, helpers, and dashboards automatically.
 
@@ -23,7 +23,7 @@ Automated Home Assistant setup wizard for the Nidia ecosystem. Simplifies initia
 1. Open HACS in your Home Assistant instance.
 2. Go to `Integrations`.
 3. Click the three dots in the top right and select `Custom repositories`.
-4. Add this repository URL: `https://github.com/antoniobaldassarre/nidia-magic-composer`.
+4. Add this repository URL: `https://github.com/antbald/nidia-magic-composer`.
 5. Select category `Integration`.
 6. Click `Add`.
 7. Find `Nidia Magic Composer` in the list and click `Download`.
@@ -31,7 +31,7 @@ Automated Home Assistant setup wizard for the Nidia ecosystem. Simplifies initia
 
 ### Manual Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/antoniobaldassarre/nidia-magic-composer/releases).
+1. Download the latest release from [GitHub Releases](https://github.com/antbald/nidia-magic-composer/releases).
 2. Extract the `custom_components/nidia_magic_composer` folder.
 3. Copy it to your `custom_components` directory in Home Assistant.
 4. Restart Home Assistant.
@@ -110,7 +110,7 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/antoniobaldassarre/nidia-magic-composer/issues)
+- **Issues**: [GitHub Issues](https://github.com/antbald/nidia-magic-composer/issues)
 - **Documentation**: Wiki (coming soon)
 
 ## Roadmap
