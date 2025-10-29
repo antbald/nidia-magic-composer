@@ -10,6 +10,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.exceptions import HomeAssistantError
 
 from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON, PANEL_STATIC_URL
 from .websocket_api import async_register_area_commands
@@ -84,14 +85,17 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
 
         panel_assets = Path(__file__).parent / "panel"
         if not panel_assets.exists():
-            _LOGGER.warning("Panel assets are missing from %s", panel_assets)
-        else:
-            registry = hass.data.setdefault(DOMAIN, {})
-            if not registry.get("panel_static_registered"):
-                await hass.http.async_register_static_paths(
-                    [StaticPathConfig(PANEL_STATIC_URL, str(panel_assets))]
-                )
-                registry["panel_static_registered"] = True
+            raise HomeAssistantError(
+                f"Panel assets are missing from {panel_assets}. "
+                "Reinstall the integration or rebuild the frontend (npm run build)."
+            )
+
+        registry = hass.data.setdefault(DOMAIN, {})
+        if not registry.get("panel_static_registered"):
+            await hass.http.async_register_static_paths(
+                [StaticPathConfig(PANEL_STATIC_URL, str(panel_assets))]
+            )
+            registry["panel_static_registered"] = True
 
         # Remove any previously registered panel with the same name to prevent duplicates.
         async_remove_panel(hass, PANEL_NAME, warn_if_unknown=False)

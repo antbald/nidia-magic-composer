@@ -37,7 +37,7 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>Version 0.1.7 | Nidia Ecosystem</p>
+          <p>Version 0.1.8 | Nidia Ecosystem</p>
         </footer>
       </div>
     </Router>

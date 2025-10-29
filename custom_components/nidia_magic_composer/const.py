@@ -7,7 +7,7 @@ DOMAIN = "nidia_magic_composer"
 NAME = "Nidia Magic Composer"
 
 # Version
-VERSION = "0.1.7"
+VERSION = "0.1.8"
 
 # Panel configuration
 PANEL_NAME = "nidia-magic-composer"
