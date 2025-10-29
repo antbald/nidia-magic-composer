@@ -81,9 +81,9 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
         )
 
         # Remove any previously registered panel with the same name to prevent duplicates.
-        async_remove_panel(hass, PANEL_NAME)
+        async_remove_panel(hass, PANEL_NAME, warn_if_unknown=False)
 
-        await async_register_built_in_panel(
+        async_register_built_in_panel(
             hass,
             component_name="custom",
             sidebar_title=PANEL_TITLE,
