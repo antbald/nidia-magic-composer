@@ -13,7 +13,6 @@ VERSION = "0.1.8"
 PANEL_NAME = "nidia-magic-composer"
 PANEL_TITLE = "Magic Composer"
 PANEL_ICON = "mdi:auto-fix"
-PANEL_STATIC_URL = f"/{PANEL_NAME}"
 
 # WebSocket command types
 WS_TYPE_AREAS_LIST = f"{DOMAIN}/areas/list"

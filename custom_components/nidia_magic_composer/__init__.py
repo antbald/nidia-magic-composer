@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,7 +13,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.exceptions import HomeAssistantError
 
-from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON, PANEL_STATIC_URL
+from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON, VERSION
 from .websocket_api import async_register_area_commands
 
 if TYPE_CHECKING:
@@ -81,7 +82,9 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
             async_register_built_in_panel,
             async_remove_panel,
         )
-        from homeassistant.components.http import StaticPathConfig
+
+        # Remove any previously registered panel with the same name to prevent duplicates.
+        async_remove_panel(hass, PANEL_NAME, warn_if_unknown=False)
 
         panel_assets = Path(__file__).parent / "panel"
         if not panel_assets.exists():
@@ -90,15 +93,15 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
                 "Reinstall the integration or rebuild the frontend (npm run build)."
             )
 
-        registry = hass.data.setdefault(DOMAIN, {})
-        if not registry.get("panel_static_registered"):
-            await hass.http.async_register_static_paths(
-                [StaticPathConfig(PANEL_STATIC_URL, str(panel_assets))]
-            )
-            registry["panel_static_registered"] = True
-
-        # Remove any previously registered panel with the same name to prevent duplicates.
-        async_remove_panel(hass, PANEL_NAME, warn_if_unknown=False)
+        www_dir = Path(hass.config.path("www"))
+        target_dir = www_dir / PANEL_NAME
+        try:
+            target_dir.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(panel_assets, target_dir, dirs_exist_ok=True)
+        except OSError as err:
+            raise HomeAssistantError(
+                f"Failed to copy panel assets to {target_dir}: {err}"
+            ) from err
 
         async_register_built_in_panel(
             hass,
@@ -111,7 +114,7 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
                     "name": PANEL_NAME,
                     "embed_iframe": True,
                     "trust_external": False,
-                    "js_url": f"{PANEL_STATIC_URL}/index.js",
+                    "js_url": f"/local/{PANEL_NAME}/index.js?v={VERSION}",
                 }
             },
             require_admin=True,
