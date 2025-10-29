@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rollback capability
 - Version tracking and history
 
+## [0.1.9] - 2024-10-30
+
+### Fixed
+- Copy the compiled panel bundle into `/config/www` and version the `/local` URL so the frontend loads reliably.
+
 ## [0.1.8] - 2024-10-30
 
 ### Fixed
@@ -71,7 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder views for wizard steps
 - HACS integration support
 
-[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.1.9...HEAD
+[0.1.9]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.9
 [0.1.8]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.8
 [0.1.7]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.7
 [0.1.6]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.6
