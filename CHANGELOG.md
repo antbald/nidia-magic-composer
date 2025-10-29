@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rollback capability
 - Version tracking and history
 
+## [0.2.1] - 2024-10-31
+
+### Fixed
+- Guarantee the panel bootstraps inside Home Assistant's iframe by creating the mounting root when it is missing.
+
 ## [0.2.0] - 2024-10-31
 
 ### Fixed
@@ -82,7 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder views for wizard steps
 - HACS integration support
 
-[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.2.1
 [0.2.0]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.2.0
 [0.1.9]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.9
 [0.1.8]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.8
