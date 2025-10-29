@@ -44,12 +44,10 @@ class NidiaMagicComposerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(
                     CONF_PROFILE_NAME,
                     default="Default Profile",
-                    description={"suggested_value": "Default Profile"},
                 ): cv.string,
                 vol.Optional(
                     CONF_ENABLE_ADVANCED,
                     default=False,
-                    description={"suggested_value": False},
                 ): cv.boolean,
             }
         )

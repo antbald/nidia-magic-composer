@@ -7,14 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Initial project structure and skeleton
-- Backend integration with config flow
-- WebSocket API handlers for area management
-- Frontend React app with routing (Profile, Rooms, Map, Helpers, Dashboards, Review)
-- HACS compatibility configuration
-- Basic documentation and README
-
 ### TODO
 - Profile configuration implementation
 - Room management with device assignment
@@ -24,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changeset preview and apply functionality
 - Rollback capability
 - Version tracking and history
+
+## [0.1.2] - 2024-10-30
+
+### Fixed
+- Removed unsupported schema descriptions so the config flow registers correctly.
+- Updated manifest metadata and rebuilt the frontend bundle.
 
 ## [0.1.1] - 2024-10-30
 
@@ -42,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder views for wizard steps
 - HACS integration support
 
-[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.2
 [0.1.1]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.1
 [0.1.0]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.0
