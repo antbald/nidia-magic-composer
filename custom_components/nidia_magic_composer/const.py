@@ -7,7 +7,7 @@ DOMAIN = "nidia_magic_composer"
 NAME = "Nidia Magic Composer"
 
 # Version
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 
 # Panel configuration
 PANEL_URL = "/api/panel_custom/nidia-magic-composer"

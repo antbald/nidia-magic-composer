@@ -75,7 +75,7 @@ class NidiaMagicComposerOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -87,8 +87,8 @@ class NidiaMagicComposerOptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         # Get current values
-        current_profile = self.config_entry.data.get(CONF_PROFILE_NAME, "Default Profile")
-        current_advanced = self.config_entry.options.get(CONF_ENABLE_ADVANCED, False)
+        current_profile = self._config_entry.data.get(CONF_PROFILE_NAME, "Default Profile")
+        current_advanced = self._config_entry.options.get(CONF_ENABLE_ADVANCED, False)
 
         data_schema = vol.Schema(
             {
