@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   build-frontend:
     name: Build Frontend
@@ -36,6 +39,8 @@ jobs:
           path: custom_components/nidia_magic_composer/panel/
 
   release:
+    permissions:
+      contents: write
     name: Create Release Asset
     needs: build-frontend
     runs-on: ubuntu-latest
