@@ -96,8 +96,9 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
         www_dir = Path(hass.config.path("www"))
         target_dir = www_dir / PANEL_NAME
         try:
-            target_dir.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(panel_assets, target_dir, dirs_exist_ok=True)
+            await hass.async_add_executor_job(
+                _copy_panel_assets, panel_assets, target_dir
+            )
         except OSError as err:
             raise HomeAssistantError(
                 f"Failed to copy panel assets to {target_dir}: {err}"
@@ -123,3 +124,9 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
     except Exception as err:
         _LOGGER.error("Failed to register custom panel: %s", err)
         raise
+
+
+def _copy_panel_assets(panel_assets: Path, target_dir: Path) -> None:
+    """Copy panel build assets into Home Assistant's www directory."""
+    target_dir.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(panel_assets, target_dir, dirs_exist_ok=True)
