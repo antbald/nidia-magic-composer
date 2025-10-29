@@ -1,0 +1,111 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #646cff;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.app-nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.nav-link {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background-color: rgba(100, 108, 255, 0.1);
+  transition: all 0.25s;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background-color: rgba(100, 108, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.app-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  min-height: 400px;
+}
+
+.app-footer {
+  text-align: center;
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.view-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.view-container h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #646cff;
+}
+
+.view-container p {
+  line-height: 1.6;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.placeholder-message {
+  padding: 2rem;
+  text-align: center;
+  background-color: rgba(100, 108, 255, 0.05);
+  border-radius: 8px;
+  border: 1px dashed rgba(100, 108, 255, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  .app-nav {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .app-content {
+    background-color: rgba(0, 0, 0, 0.01);
+  }
+
+  .view-container p {
+    color: #333;
+  }
+
+  .placeholder-message {
+    background-color: rgba(100, 108, 255, 0.05);
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Nidia Magic Composer",
+  "content_in_root": false,
+  "filename": "nidia_magic_composer",
+  "render_readme": true,
+  "country": ["IT"],
+  "homeassistant": "2024.1.0"
+}

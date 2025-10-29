@@ -1,0 +1,51 @@
+# Service definitions for Nidia Magic Composer
+
+wizard_preview:
+  name: Wizard Preview
+  description: Generate a preview of changes that will be applied by the wizard
+  fields:
+    profile:
+      name: Profile Configuration
+      description: Profile configuration data containing rooms, helpers, and dashboard definitions
+      required: true
+      example: '{"name": "Home Profile", "rooms": []}'
+      selector:
+        object:
+
+wizard_apply:
+  name: Wizard Apply
+  description: Apply a wizard changeset to the Home Assistant instance
+  fields:
+    changeset_id:
+      name: Changeset ID
+      description: Unique identifier of the changeset to apply
+      required: true
+      example: "changeset_abc123"
+      selector:
+        text:
+
+create_area:
+  name: Create Area
+  description: Create a new area (room) in Home Assistant
+  fields:
+    name:
+      name: Area Name
+      description: Name of the area to create
+      required: true
+      example: "Living Room"
+      selector:
+        text:
+    picture:
+      name: Picture URL
+      description: Optional picture URL for the area
+      required: false
+      example: "/local/images/living_room.jpg"
+      selector:
+        text:
+    aliases:
+      name: Aliases
+      description: Optional list of aliases for voice control
+      required: false
+      example: '["lounge", "main room"]'
+      selector:
+        object:

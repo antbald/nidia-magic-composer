@@ -1,0 +1,13 @@
+{
+  "domain": "nidia_magic_composer",
+  "name": "Nidia Magic Composer",
+  "codeowners": ["@antoniobaldassarre"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/antoniobaldassarre/nidia-magic-composer",
+  "integration_type": "system",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/antoniobaldassarre/nidia-magic-composer/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
