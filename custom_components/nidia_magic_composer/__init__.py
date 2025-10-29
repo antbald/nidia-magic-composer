@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntry
@@ -10,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON
+from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON, PANEL_STATIC_URL
 from .websocket_api import async_register_area_commands
 
 if TYPE_CHECKING:
@@ -79,6 +80,18 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
             async_register_built_in_panel,
             async_remove_panel,
         )
+        from homeassistant.components.http import StaticPathConfig
+
+        panel_assets = Path(__file__).parent / "panel"
+        if not panel_assets.exists():
+            _LOGGER.warning("Panel assets are missing from %s", panel_assets)
+        else:
+            registry = hass.data.setdefault(DOMAIN, {})
+            if not registry.get("panel_static_registered"):
+                await hass.http.async_register_static_paths(
+                    [StaticPathConfig(PANEL_STATIC_URL, str(panel_assets))]
+                )
+                registry["panel_static_registered"] = True
 
         # Remove any previously registered panel with the same name to prevent duplicates.
         async_remove_panel(hass, PANEL_NAME, warn_if_unknown=False)
@@ -94,7 +107,7 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
                     "name": PANEL_NAME,
                     "embed_iframe": True,
                     "trust_external": False,
-                    "js_url": f"/local/nidia_magic_composer/index.js",
+                    "js_url": f"{PANEL_STATIC_URL}/index.js",
                 }
             },
             require_admin=True,

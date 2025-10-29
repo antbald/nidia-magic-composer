@@ -7,13 +7,13 @@ DOMAIN = "nidia_magic_composer"
 NAME = "Nidia Magic Composer"
 
 # Version
-VERSION = "0.1.6"
+VERSION = "0.1.7"
 
 # Panel configuration
-PANEL_URL = "/api/panel_custom/nidia-magic-composer"
 PANEL_NAME = "nidia-magic-composer"
 PANEL_TITLE = "Magic Composer"
 PANEL_ICON = "mdi:auto-fix"
+PANEL_STATIC_URL = f"/{PANEL_NAME}"
 
 # WebSocket command types
 WS_TYPE_AREAS_LIST = f"{DOMAIN}/areas/list"
