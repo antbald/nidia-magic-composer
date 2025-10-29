@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 import logging
-import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.exceptions import HomeAssistantError
@@ -39,8 +39,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Setting up Nidia Magic Composer integration")
 
     # Initialize domain data storage
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {
+    domain_data: dict[str, Any] = hass.data.setdefault(DOMAIN, {})
+    domain_data[entry.entry_id] = {
         "config": entry.data,
         "options": entry.options,
     }
@@ -93,16 +93,26 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
                 "Reinstall the integration or rebuild the frontend (npm run build)."
             )
 
-        www_dir = Path(hass.config.path("www"))
-        target_dir = www_dir / PANEL_NAME
-        try:
-            await hass.async_add_executor_job(
-                _copy_panel_assets, panel_assets, target_dir
-            )
-        except OSError as err:
-            raise HomeAssistantError(
-                f"Failed to copy panel assets to {target_dir}: {err}"
-            ) from err
+        domain_data: dict[str, Any] = hass.data.setdefault(DOMAIN, {})
+        static_paths: set[str] = domain_data.setdefault("static_paths", set())
+        static_url_path = f"/{PANEL_NAME}-{VERSION}"
+
+        if static_url_path not in static_paths:
+            try:
+                await hass.http.async_register_static_paths(
+                    [
+                        StaticPathConfig(
+                            url_path=static_url_path,
+                            path=str(panel_assets),
+                        )
+                    ]
+                )
+            except OSError as err:
+                raise HomeAssistantError(
+                    f"Failed to expose panel assets at {static_url_path}: {err}"
+                ) from err
+
+            static_paths.add(static_url_path)
 
         async_register_built_in_panel(
             hass,
@@ -115,7 +125,8 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
                     "name": PANEL_NAME,
                     "embed_iframe": True,
                     "trust_external": False,
-                    "js_url": f"/local/{PANEL_NAME}/index.js?v={VERSION}",
+                    "module_url": f"{static_url_path}/index.js?v={VERSION}",
+                    "js_url": f"{static_url_path}/index.js?v={VERSION}",
                 }
             },
             require_admin=True,
@@ -124,9 +135,3 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
     except Exception as err:
         _LOGGER.error("Failed to register custom panel: %s", err)
         raise
-
-
-def _copy_panel_assets(panel_assets: Path, target_dir: Path) -> None:
-    """Copy panel build assets into Home Assistant's www directory."""
-    target_dir.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(panel_assets, target_dir, dirs_exist_ok=True)
