@@ -1,0 +1,34 @@
+{
+  "title": "Nidia Magic Composer",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Nidia Magic Composer",
+        "description": "Set up the Magic Composer wizard to automate your Home Assistant configuration.",
+        "data": {
+          "profile_name": "Profile name",
+          "enable_advanced": "Enable advanced features"
+        }
+      }
+    },
+    "error": {
+      "already_configured": "This integration is already configured.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "Nidia Magic Composer is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Nidia Magic Composer options",
+        "description": "Update the defaults for the Magic Composer wizard.",
+        "data": {
+          "profile_name": "Profile name",
+          "enable_advanced": "Enable advanced features"
+        }
+      }
+    }
+  }
+}
