@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rollback capability
 - Version tracking and history
 
+## [0.3.0] - 2024-10-31
+
+### Added
+- Provide a guided two-pane wizard with progress tracking, contextual status cards, and quick actions across every step.
+- Introduce a shared wizard data layer with editable profile, rooms, helpers, dashboards, and review details to simulate the end-to-end flow.
+
+### Changed
+- Reworked each view (Profile, Rooms, Map, Helpers, Dashboards, Review) into interactive cards with previews, toggles, and helper text for a polished UX.
+
 ## [0.2.1] - 2024-10-31
 
 ### Fixed
@@ -87,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder views for wizard steps
 - HACS integration support
 
-[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/antbald/nidia-magic-composer/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.3.0
 [0.2.1]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.2.1
 [0.2.0]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.2.0
 [0.1.9]: https://github.com/antbald/nidia-magic-composer/releases/tag/v0.1.9

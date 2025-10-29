@@ -1,276 +1,261 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useHassConnection } from '../hooks/useHassConnection'
+import { ChangeEvent, FormEvent, useMemo, useState } from 'react'
+import { useWizard } from '../hooks/useWizard'
 
-type Area = {
-  id: string
-  name: string
+const purposeOptions = [
+  'Living',
+  'Kitchen',
+  'Bedroom',
+  'Bathroom',
+  'Office',
+  'Outdoor',
+  'Utility',
+  'Custom',
+]
+
+const baseFloorLabels = [
+  'Ground floor',
+  'First floor',
+  'Second floor',
+  'Third floor',
+  'Fourth floor',
+  'Fifth floor',
+]
+
+const defaultDraft = {
+  name: '',
+  floor: 'Ground floor',
+  purpose: 'Living',
+  coverage: '',
+  devices: '',
 }
 
-type AreaListResponse = {
-  areas: Area[]
-}
+const Rooms = () => {
+  const { state, addRoom, updateRoom, removeRoom } = useWizard()
+  const [draftRoom, setDraftRoom] = useState(defaultDraft)
 
-type AreaMutationResponse = {
-  area: Area
-}
+  const floorOptions = useMemo(() => {
+    const floors = Math.max(state.profile.floors, 1)
+    const labels = baseFloorLabels.slice(0, floors)
+    if (floors > baseFloorLabels.length) {
+      for (let index = baseFloorLabels.length; index < floors; index += 1) {
+        labels.push(`Floor ${index}`)
+      }
+    }
+    const additionalFloors = state.rooms
+      .map((room) => room.floor)
+      .filter((floor) => !labels.includes(floor))
+    return [...labels, ...additionalFloors]
+  }, [state.profile.floors, state.rooms])
 
-type AreaDeleteResponse = {
-  success: boolean
-  area_id: string
-}
+  const handleDraftChange =
+    (field: keyof typeof defaultDraft) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      setDraftRoom((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }))
+    }
 
-const WS_TYPE_AREAS_LIST = 'nidia_magic_composer/areas/list'
-const WS_TYPE_AREAS_CREATE = 'nidia_magic_composer/areas/create'
-const WS_TYPE_AREAS_UPDATE = 'nidia_magic_composer/areas/update'
-const WS_TYPE_AREAS_DELETE = 'nidia_magic_composer/areas/delete'
+  const handleAddRoom = (event: FormEvent) => {
+    event.preventDefault()
+    if (!draftRoom.name.trim()) {
+      return
+    }
 
-function toErrorMessage(error: unknown, fallback: string): string {
-  if (!error) {
-    return fallback
+    addRoom({
+      name: draftRoom.name.trim(),
+      floor: draftRoom.floor,
+      purpose: draftRoom.purpose,
+      coverage: draftRoom.coverage.trim() || 'General coverage',
+      devices: draftRoom.devices
+        .split(',')
+        .map((device) => device.trim())
+        .filter(Boolean),
+    })
+
+    setDraftRoom(defaultDraft)
   }
 
-  if (typeof error === 'string') {
-    return error
-  }
-
-  if (error instanceof Error) {
-    return error.message || fallback
-  }
-
-  if (typeof error === 'object') {
-    const message =
-      (error as { message?: string }).message ??
-      (error as { error?: { message?: string } }).error?.message
-    if (message) {
-      return message
+  const handleDeviceChange =
+    (roomId: string) =>
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
+      const devices = event.target.value
+        .split(',')
+        .map((device) => device.trim())
+        .filter(Boolean)
+      updateRoom(roomId, { devices })
     }
-    const code = (error as { code?: string }).code
-    if (code) {
-      return `${fallback} (${code})`
-    }
-  }
-
-  return fallback
-}
-
-const Rooms: React.FC = () => {
-  const connection = useHassConnection()
-  const [areas, setAreas] = useState<Area[]>([])
-  const [selectedAreaId, setSelectedAreaId] = useState<string>('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [isBusy, setIsBusy] = useState<boolean>(false)
-  const [refreshCounter, setRefreshCounter] = useState(0)
-
-  const selectedArea = useMemo(
-    () => areas.find((area) => area.id === selectedAreaId) ?? null,
-    [areas, selectedAreaId],
-  )
-
-  useEffect(() => {
-    if (!connection) {
-      setLoading(false)
-      return
-    }
-
-    let isActive = true
-    setLoading(true)
-    setError(null)
-
-    connection
-      .sendMessagePromise<AreaListResponse>({ type: WS_TYPE_AREAS_LIST })
-      .then((result) => {
-        if (!isActive) {
-          return
-        }
-        setAreas(result.areas)
-        if (result.areas.every((area) => area.id !== selectedAreaId)) {
-          setSelectedAreaId('')
-        }
-      })
-      .catch((err) => {
-        if (isActive) {
-          setError(toErrorMessage(err, 'Failed to load rooms'))
-        }
-      })
-      .finally(() => {
-        if (isActive) {
-          setLoading(false)
-        }
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [connection, refreshCounter, selectedAreaId])
-
-  const triggerRefresh = useCallback(
-    () => setRefreshCounter((value) => value + 1),
-    [],
-  )
-
-  const handleCreate = useCallback(async () => {
-    if (!connection) {
-      setError('Waiting for Home Assistant connection…')
-      return
-    }
-
-    const name = window.prompt('Enter a name for the new room')
-    if (!name) {
-      return
-    }
-
-    setIsBusy(true)
-    setError(null)
-
-    try {
-      await connection.sendMessagePromise<AreaMutationResponse>({
-        type: WS_TYPE_AREAS_CREATE,
-        name,
-      })
-      triggerRefresh()
-    } catch (err) {
-      setError(toErrorMessage(err, 'Failed to create room'))
-    } finally {
-      setIsBusy(false)
-    }
-  }, [connection, triggerRefresh])
-
-  const handleRename = useCallback(async () => {
-    if (!connection) {
-      setError('Waiting for Home Assistant connection…')
-      return
-    }
-
-    if (!selectedArea) {
-      setError('Select a room to rename')
-      return
-    }
-
-    const newName = window.prompt('Rename room', selectedArea.name)
-    if (newName === null) {
-      return
-    }
-
-    const normalizedName = newName.trim()
-    if (!normalizedName) {
-      setError('Room name cannot be empty')
-      return
-    }
-
-    setIsBusy(true)
-    setError(null)
-
-    try {
-      await connection.sendMessagePromise<AreaMutationResponse>({
-        type: WS_TYPE_AREAS_UPDATE,
-        area_id: selectedArea.id,
-        name: normalizedName,
-      })
-      triggerRefresh()
-    } catch (err) {
-      setError(toErrorMessage(err, 'Failed to rename room'))
-    } finally {
-      setIsBusy(false)
-    }
-  }, [connection, selectedArea, triggerRefresh])
-
-  const handleDelete = useCallback(async () => {
-    if (!connection) {
-      setError('Waiting for Home Assistant connection…')
-      return
-    }
-
-    if (!selectedArea) {
-      setError('Select a room to delete')
-      return
-    }
-
-    const confirmed = window.confirm(
-      `Delete room “${selectedArea.name}”? This cannot be undone.`,
-    )
-    if (!confirmed) {
-      return
-    }
-
-    setIsBusy(true)
-    setError(null)
-
-    try {
-      await connection.sendMessagePromise<AreaDeleteResponse>({
-        type: WS_TYPE_AREAS_DELETE,
-        area_id: selectedArea.id,
-      })
-      setSelectedAreaId('')
-      triggerRefresh()
-    } catch (err) {
-      setError(toErrorMessage(err, 'Failed to delete room'))
-    } finally {
-      setIsBusy(false)
-    }
-  }, [connection, selectedArea, triggerRefresh])
-
-  const disableActions = !connection || isBusy
 
   return (
-    <div className="view-container">
-      <h2>Room Management</h2>
-      <p>Manage Home Assistant rooms directly from the Magic Composer wizard.</p>
+    <div className="view-stack">
+      <section className="card">
+        <header className="card-header">
+          <h3>Rooms and functional areas</h3>
+          <p>
+            Map every room, shared space, and service area. We use these definitions to build helpers,
+            dashboards, and automation scopes.
+          </p>
+        </header>
 
-      {error && (
-        <div className="error-banner" role="alert">
-          {error}
+        <div className="card-body">
+          {state.rooms.length === 0 ? (
+            <div className="empty-state">
+              <p>No rooms yet. Add your first room to start planning automation coverage.</p>
+            </div>
+          ) : (
+            <div className="room-grid">
+              {state.rooms.map((room) => (
+                <div key={room.id} className="room-card">
+                  <header>
+                    <h4>{room.name}</h4>
+                  </header>
+                  <div className="room-meta">
+                    <span>{room.floor}</span>
+                    <span>•</span>
+                    <span>{room.purpose}</span>
+                  </div>
+                  <div className="form-field">
+                    <label>Purpose</label>
+                    <select
+                      value={room.purpose}
+                      onChange={(event) => updateRoom(room.id, { purpose: event.target.value })}
+                    >
+                      {purposeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-field">
+                    <label>Devices & services</label>
+                    <textarea
+                      placeholder="Lighting, blinds, climate, sensors…"
+                      value={room.devices.join(', ')}
+                      onChange={handleDeviceChange(room.id)}
+                    />
+                    <span className="form-helper">
+                      Separate with commas. We’ll recommend helpers based on your coverage.
+                    </span>
+                  </div>
+                  <div className="form-field">
+                    <label>Coverage notes</label>
+                    <textarea
+                      placeholder="Describe special areas or automation expectations."
+                      value={room.coverage}
+                      onChange={(event) =>
+                        updateRoom(room.id, { coverage: event.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="card-footer">
+                    <span>Linked to {room.devices.length} devices</span>
+                    <button type="button" onClick={() => removeRoom(room.id)}>
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
-      <section className="rooms-panel">
-        <div className="rooms-toolbar">
-          <button
-            type="button"
-            onClick={handleCreate}
-            disabled={disableActions}
-            className="primary-button"
-          >
-            Create Room
-          </button>
-          <button
-            type="button"
-            onClick={handleRename}
-            disabled={disableActions || !selectedArea}
-          >
-            Rename Room
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={disableActions || !selectedArea}
-          >
-            Delete Room
-          </button>
-        </div>
+      <section className="card">
+        <header className="card-header">
+          <h3>Add another room</h3>
+          <p>Keep going until every space that needs automation is mapped.</p>
+        </header>
 
-        <div className="rooms-list">
-          <label htmlFor="room-select">Existing rooms</label>
-          <select
-            id="room-select"
-            value={selectedAreaId}
-            onChange={(event) => setSelectedAreaId(event.target.value)}
-            disabled={loading || disableActions || areas.length === 0}
-          >
-            <option value="">{loading ? 'Loading…' : 'Select a room'}</option>
-            {areas.map((area) => (
-              <option key={area.id} value={area.id}>
-                {area.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <form className="card-body" onSubmit={handleAddRoom}>
+          <div className="form-grid two-column">
+            <div className="form-field">
+              <label htmlFor="room-name">Room name</label>
+              <input
+                id="room-name"
+                type="text"
+                placeholder="e.g. Master bedroom"
+                value={draftRoom.name}
+                onChange={handleDraftChange('name')}
+              />
+            </div>
 
-        {!loading && areas.length === 0 && (
-          <p className="empty-state">No rooms yet. Create your first room.</p>
-        )}
+            <div className="form-field">
+              <label htmlFor="room-floor">Floor</label>
+              <select
+                id="room-floor"
+                value={draftRoom.floor}
+                onChange={handleDraftChange('floor')}
+              >
+                {floorOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {loading && <p>Loading rooms…</p>}
+            <div className="form-field">
+              <label htmlFor="room-purpose">Purpose</label>
+              <select
+                id="room-purpose"
+                value={draftRoom.purpose}
+                onChange={handleDraftChange('purpose')}
+              >
+                {purposeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="room-coverage">Coverage notes</label>
+              <textarea
+                id="room-coverage"
+                placeholder="e.g. Include wardrobe lights and wardrobe contact sensor."
+                value={draftRoom.coverage}
+                onChange={handleDraftChange('coverage')}
+              />
+            </div>
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="room-devices">Devices</label>
+            <textarea
+              id="room-devices"
+              placeholder="Lights, scenes, climate, sensors…"
+              value={draftRoom.devices}
+              onChange={handleDraftChange('devices')}
+            />
+            <span className="form-helper">
+              Comma separated list of devices or services already available in this room.
+            </span>
+          </div>
+
+          <div className="cta-row">
+            <button type="submit" className="primary">
+              Add room
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() =>
+                addRoom({
+                  name: 'Outdoor terrace',
+                  floor: 'Outdoor',
+                  purpose: 'Outdoor',
+                  coverage: 'Accent lighting, awnings, speakers',
+                  devices: ['Lighting', 'Awnings', 'Speakers'],
+                })
+              }
+            >
+              Quick add: outdoor area
+            </button>
+          </div>
+        </form>
       </section>
     </div>
   )
