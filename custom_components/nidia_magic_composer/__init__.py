@@ -75,7 +75,9 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
     """Register the custom panel for the integration."""
     try:
         # Register the panel using the frontend component
-        await hass.components.frontend.async_register_built_in_panel(
+        from homeassistant.components.frontend import async_register_built_in_panel
+
+        await async_register_built_in_panel(
             component_name="custom",
             sidebar_title=PANEL_TITLE,
             sidebar_icon=PANEL_ICON,
