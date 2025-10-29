@@ -81,7 +81,7 @@ async def _async_register_panel(hass: HomeAssistant) -> None:
         )
 
         # Remove any previously registered panel with the same name to prevent duplicates.
-        await async_remove_panel(hass, PANEL_NAME)
+        async_remove_panel(hass, PANEL_NAME)
 
         await async_register_built_in_panel(
             hass,
