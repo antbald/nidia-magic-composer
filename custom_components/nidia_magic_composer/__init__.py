@@ -14,7 +14,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.exceptions import HomeAssistantError
 
 from .const import DOMAIN, PANEL_NAME, PANEL_TITLE, PANEL_ICON, VERSION
-from .websocket_api import async_register_area_commands
+from .websocket_api import async_register_area_commands, async_register_floor_commands
 
 if TYPE_CHECKING:
     from homeassistant.components.frontend import Panel
@@ -47,6 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Register WebSocket API handlers
     async_register_area_commands(hass)
+    async_register_floor_commands(hass)
 
     # Register custom panel
     await _async_register_panel(hass)
