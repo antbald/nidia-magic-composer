@@ -194,7 +194,7 @@ cp -r custom_components/nidia_magic_composer \
 # Initialize git (if not already)
 git init
 git add .
-git commit -m "Release v0.3.0"
+git commit -m "Release v0.3.1"
 
 # Add remote and push
 git remote add origin https://github.com/antbald/nidia-magic-composer.git
@@ -202,14 +202,14 @@ git branch -M main
 git push -u origin main
 
 # Create release tag
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.3.1
+git push origin v0.3.1
 ```
 
 Then create a GitHub Release:
 1. Go to repository → Releases → New Release
-2. Tag: `v0.3.0`
-3. Title: `v0.3.0 - Guided UX journey`
+2. Tag: `v0.3.1`
+3. Title: `v0.3.1 - Metadata refresh`
 4. Description: Copy from CHANGELOG.md
 5. Publish
 
@@ -221,5 +221,5 @@ Then create a GitHub Release:
 ---
 
 **Status**: ✅ Phase 1 Complete - Ready for Development
-**Version**: 0.3.0
-**Last Updated**: 2024-10-31
+**Version**: 0.3.1
+**Last Updated**: 2024-11-01

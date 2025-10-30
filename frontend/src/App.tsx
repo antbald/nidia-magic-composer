@@ -16,7 +16,7 @@ import Review from './views/Review'
 import { WizardProvider, type WizardState } from './state/WizardContext'
 import { useWizard } from './hooks/useWizard'
 
-const CURRENT_VERSION = '0.3.0'
+const CURRENT_VERSION = '0.3.1'
 
 type StepStatus = 'done' | 'active' | 'todo'
 
