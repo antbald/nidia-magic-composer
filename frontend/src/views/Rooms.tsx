@@ -1,258 +1,236 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react'
-import { useWizard } from '../hooks/useWizard'
+import { useRooms } from '../hooks/useRooms'
 
 const purposeOptions = [
-  'Living',
-  'Kitchen',
-  'Bedroom',
-  'Bathroom',
-  'Office',
-  'Outdoor',
-  'Utility',
-  'Custom',
+  'Zona giorno',
+  'Cucina',
+  'Camera da letto',
+  'Bagno',
+  'Studio',
+  'Esterno',
+  'Locale tecnico',
+  'Altro',
 ]
 
-const baseFloorLabels = [
-  'Ground floor',
-  'First floor',
-  'Second floor',
-  'Third floor',
-  'Fourth floor',
-  'Fifth floor',
-]
-
-const defaultDraft = {
+const defaultFormState = {
   name: '',
-  floor: 'Ground floor',
-  purpose: 'Living',
-  coverage: '',
+  floor: 'Piano terra',
+  purpose: 'Zona giorno',
+  notes: '',
   devices: '',
 }
 
+const sanitizeList = (value: string) =>
+  value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+
 const Rooms = () => {
-  const { state, addRoom, updateRoom, removeRoom } = useWizard()
-  const [draftRoom, setDraftRoom] = useState(defaultDraft)
+  const { rooms, addRoom, updateRoom, removeRoom } = useRooms()
+  const [formState, setFormState] = useState(defaultFormState)
 
-  const floorOptions = useMemo(() => {
-    const floors = Math.max(state.profile.floors, 1)
-    const labels = baseFloorLabels.slice(0, floors)
-    if (floors > baseFloorLabels.length) {
-      for (let index = baseFloorLabels.length; index < floors; index += 1) {
-        labels.push(`Floor ${index}`)
-      }
-    }
-    const additionalFloors = state.rooms
-      .map((room) => room.floor)
-      .filter((floor) => !labels.includes(floor))
-    return [...labels, ...additionalFloors]
-  }, [state.profile.floors, state.rooms])
+  const totalDevices = useMemo(
+    () => rooms.reduce((count, room) => count + room.devices.length, 0),
+    [rooms],
+  )
 
-  const handleDraftChange =
-    (field: keyof typeof defaultDraft) =>
+  const handleFormChange =
+    (field: keyof typeof defaultFormState) =>
     (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      setDraftRoom((prev) => ({
-        ...prev,
+      setFormState((previous) => ({
+        ...previous,
         [field]: event.target.value,
       }))
     }
 
-  const handleAddRoom = (event: FormEvent) => {
+  const handleAddRoom = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!draftRoom.name.trim()) {
+    const name = formState.name.trim()
+
+    if (!name) {
       return
     }
 
     addRoom({
-      name: draftRoom.name.trim(),
-      floor: draftRoom.floor,
-      purpose: draftRoom.purpose,
-      coverage: draftRoom.coverage.trim() || 'General coverage',
-      devices: draftRoom.devices
-        .split(',')
-        .map((device) => device.trim())
-        .filter(Boolean),
+      name,
+      floor: formState.floor.trim() || 'Piano terra',
+      purpose: formState.purpose,
+      notes: formState.notes.trim(),
+      devices: sanitizeList(formState.devices),
     })
 
-    setDraftRoom(defaultDraft)
+    setFormState(defaultFormState)
   }
 
-  const handleDeviceChange =
-    (roomId: string) =>
-    (event: ChangeEvent<HTMLTextAreaElement>) => {
-      const devices = event.target.value
-        .split(',')
-        .map((device) => device.trim())
-        .filter(Boolean)
-      updateRoom(roomId, { devices })
+  const handleRoomFieldChange =
+    (roomId: string, field: 'name' | 'floor' | 'purpose' | 'notes') =>
+    (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      updateRoom(roomId, { [field]: event.target.value })
     }
 
+  const handleRoomDevicesChange = (roomId: string) => (event: ChangeEvent<HTMLTextAreaElement>) => {
+    updateRoom(roomId, { devices: sanitizeList(event.target.value) })
+  }
+
   return (
-    <div className="view-stack">
-      <section className="card">
-        <header className="card-header">
-          <h3>Rooms and functional areas</h3>
-          <p>
-            Map every room, shared space, and service area. We use these definitions to build helpers,
-            dashboards, and automation scopes.
-          </p>
+    <div className="rooms-view">
+      <section className="panel">
+        <header className="panel-header">
+          <div>
+            <h2>Le tue stanze</h2>
+            <p>
+              Gestisci ogni ambiente con descrizioni chiare e l&apos;elenco dei dispositivi presenti. Puoi
+              aggiornare i dati in qualsiasi momento.
+            </p>
+          </div>
+          <div className="summary">
+            <div>
+              <span className="summary-label">Stanze</span>
+              <span className="summary-value">{rooms.length}</span>
+            </div>
+            <div>
+              <span className="summary-label">Dispositivi tracciati</span>
+              <span className="summary-value">{totalDevices}</span>
+            </div>
+          </div>
         </header>
 
-        <div className="card-body">
-          {state.rooms.length === 0 ? (
-            <div className="empty-state">
-              <p>No rooms yet. Add your first room to start planning automation coverage.</p>
-            </div>
-          ) : (
-            <div className="room-grid">
-              {state.rooms.map((room) => (
-                <div key={room.id} className="room-card">
-                  <header>
-                    <h4>{room.name}</h4>
-                  </header>
-                  <div className="room-meta">
-                    <span>{room.floor}</span>
-                    <span>•</span>
-                    <span>{room.purpose}</span>
-                  </div>
-                  <div className="form-field">
-                    <label>Purpose</label>
-                    <select
-                      value={room.purpose}
-                      onChange={(event) => updateRoom(room.id, { purpose: event.target.value })}
-                    >
+        {rooms.length === 0 ? (
+          <div className="empty-state">
+            <h3>Nessuna stanza registrata</h3>
+            <p>Aggiungi la prima stanza utilizzando il modulo qui sotto.</p>
+          </div>
+        ) : (
+          <div className="rooms-grid">
+            {rooms.map((room) => (
+              <article key={room.id} className="room-card">
+                <div className="room-card-header">
+                  <input
+                    className="room-title"
+                    value={room.name}
+                    onChange={handleRoomFieldChange(room.id, 'name')}
+                    placeholder="Nome stanza"
+                    aria-label="Nome stanza"
+                  />
+                  <button type="button" className="delete-button" onClick={() => removeRoom(room.id)}>
+                    Elimina
+                  </button>
+                </div>
+
+                <div className="room-fields">
+                  <label className="field">
+                    <span>Piano</span>
+                    <input
+                      value={room.floor}
+                      onChange={handleRoomFieldChange(room.id, 'floor')}
+                      placeholder="Es. Primo piano"
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Uso prevalente</span>
+                    <select value={room.purpose} onChange={handleRoomFieldChange(room.id, 'purpose')}>
                       {purposeOptions.map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
                       ))}
                     </select>
-                  </div>
-                  <div className="form-field">
-                    <label>Devices & services</label>
-                    <textarea
-                      placeholder="Lighting, blinds, climate, sensors…"
-                      value={room.devices.join(', ')}
-                      onChange={handleDeviceChange(room.id)}
-                    />
-                    <span className="form-helper">
-                      Separate with commas. We’ll recommend helpers based on your coverage.
-                    </span>
-                  </div>
-                  <div className="form-field">
-                    <label>Coverage notes</label>
-                    <textarea
-                      placeholder="Describe special areas or automation expectations."
-                      value={room.coverage}
-                      onChange={(event) =>
-                        updateRoom(room.id, { coverage: event.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="card-footer">
-                    <span>Linked to {room.devices.length} devices</span>
-                    <button type="button" onClick={() => removeRoom(room.id)}>
-                      Remove
-                    </button>
-                  </div>
+                  </label>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                <label className="field">
+                  <span>Note o dettagli</span>
+                  <textarea
+                    rows={3}
+                    value={room.notes}
+                    onChange={handleRoomFieldChange(room.id, 'notes')}
+                    placeholder="Annota particolarità, orari o preferenze"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Dispositivi associati</span>
+                  <textarea
+                    rows={2}
+                    value={room.devices.join(', ')}
+                    onChange={handleRoomDevicesChange(room.id)}
+                    placeholder="Luci, sensori, clima, ecc."
+                  />
+                  <span className="field-helper">Separa i dispositivi con una virgola.</span>
+                </label>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className="card">
-        <header className="card-header">
-          <h3>Add another room</h3>
-          <p>Keep going until every space that needs automation is mapped.</p>
+      <section className="panel">
+        <header className="panel-header">
+          <div>
+            <h2>Aggiungi una nuova stanza</h2>
+            <p>Compila i campi e salva per inserire l&apos;ambiente nella lista.</p>
+          </div>
         </header>
 
-        <form className="card-body" onSubmit={handleAddRoom}>
-          <div className="form-grid two-column">
-            <div className="form-field">
-              <label htmlFor="room-name">Room name</label>
+        <form className="room-form" onSubmit={handleAddRoom}>
+          <label className="field">
+            <span>Nome stanza</span>
+            <input
+              value={formState.name}
+              onChange={handleFormChange('name')}
+              placeholder="Es. Soggiorno"
+              required
+            />
+          </label>
+
+          <div className="form-row">
+            <label className="field">
+              <span>Piano</span>
               <input
-                id="room-name"
-                type="text"
-                placeholder="e.g. Master bedroom"
-                value={draftRoom.name}
-                onChange={handleDraftChange('name')}
+                value={formState.floor}
+                onChange={handleFormChange('floor')}
+                placeholder="Es. Piano terra"
               />
-            </div>
+            </label>
 
-            <div className="form-field">
-              <label htmlFor="room-floor">Floor</label>
-              <select
-                id="room-floor"
-                value={draftRoom.floor}
-                onChange={handleDraftChange('floor')}
-              >
-                {floorOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="room-purpose">Purpose</label>
-              <select
-                id="room-purpose"
-                value={draftRoom.purpose}
-                onChange={handleDraftChange('purpose')}
-              >
+            <label className="field">
+              <span>Uso prevalente</span>
+              <select value={formState.purpose} onChange={handleFormChange('purpose')}>
                 {purposeOptions.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="room-coverage">Coverage notes</label>
-              <textarea
-                id="room-coverage"
-                placeholder="e.g. Include wardrobe lights and wardrobe contact sensor."
-                value={draftRoom.coverage}
-                onChange={handleDraftChange('coverage')}
-              />
-            </div>
+            </label>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="room-devices">Devices</label>
+          <label className="field">
+            <span>Note o dettagli</span>
             <textarea
-              id="room-devices"
-              placeholder="Lights, scenes, climate, sensors…"
-              value={draftRoom.devices}
-              onChange={handleDraftChange('devices')}
+              rows={3}
+              value={formState.notes}
+              onChange={handleFormChange('notes')}
+              placeholder="Descrivi particolarità dell'ambiente"
             />
-            <span className="form-helper">
-              Comma separated list of devices or services already available in this room.
-            </span>
-          </div>
+          </label>
 
-          <div className="cta-row">
-            <button type="submit" className="primary">
-              Add room
-            </button>
-            <button
-              type="button"
-              className="secondary"
-              onClick={() =>
-                addRoom({
-                  name: 'Outdoor terrace',
-                  floor: 'Outdoor',
-                  purpose: 'Outdoor',
-                  coverage: 'Accent lighting, awnings, speakers',
-                  devices: ['Lighting', 'Awnings', 'Speakers'],
-                })
-              }
-            >
-              Quick add: outdoor area
+          <label className="field">
+            <span>Dispositivi associati</span>
+            <textarea
+              rows={2}
+              value={formState.devices}
+              onChange={handleFormChange('devices')}
+              placeholder="Es. Luci soffitto, Sensore movimento"
+            />
+            <span className="field-helper">Separa i dispositivi con una virgola.</span>
+          </label>
+
+          <div className="actions">
+            <button type="submit" className="primary-button">
+              Salva stanza
             </button>
           </div>
         </form>
